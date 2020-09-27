@@ -13,15 +13,24 @@ from lib.sbem_model.sbem_inp_model import SbemInpModel
 #	Distributed 
 ############
 class Environment():
+	##
+	# Global 
+	##
 	ROOT			= getcwd()
-	SBEM_ROOT		= "%s/sbem/4.1.d/"
+	DATA_ROOT		= "%s/data/" %(ROOT)
+	SBEM_ROOT		= "%s/sbem/4.1.d/" %(ROOT)
 	#Environment instance directory base
 	ENV_ROOT		= "%s/environments/" %(ROOT)
 	#SbemInpModel projects directory base
 	PROJECT_ROOT	= "%s/projects/" %(ROOT)
+	##
+	# Project path directory strings
+	##
 	SBEM_DIR_ALIAS	= "processing/"
 	#SbemInpModel static file name
 	MODEL_NAME		= "model.inp"
+	#Default training data
+	DEF_TRAIN_DATA	= "%sv0_9.csv" %(DATA_ROOT)
 	##
 	#	Build a Saleh-ML Environment (static)
 	#
@@ -108,13 +117,14 @@ class Environment():
 	##
 	def printSummary(self):
 		print("\t###")
-		print("\t#Name:\t%s" %(self.name))
+		print("\t# Name:\t%s" %(self.name))
 		print("\t# Directories:")
-		print("\t#Path:\t%s" %(self.path))
-		print("\t#Processing:\t%s" %(self.processingPath))
-		print("\t#Local model:\t%s" %(self.modelPath))
-		print("\t#Base model:\t%s" %(self.baseModelPath))
-		print("\t#SBEM:\t%s" %(__class__.SBEM_ROOT))
+		print("\t#	Path:\t%s" %(self.path))
+		print("\t#	Processing:\t%s" %(self.processingPath))
+		print("\t#	Local model:\t%s" %(self.modelPath))
+		print("\t#	Base model:\t%s" %(self.baseModelPath))
+		print("\t#	SBEM:\t%s" %(__class__.SBEM_ROOT))
+		print("\t# Train data:\t%s" %(self.trainingDataPath))
 		print("\t###")
 		
 		
@@ -136,4 +146,6 @@ class Environment():
 	@property    
 	def baseModelPath(self):
 		return "%s%s/%s.inp" %(__class__.PROJECT_ROOT,str(self.modelID), str(self.modelID))
-	
+	@property
+	def trainingDataPath(self):
+		return "%s" %(__class__.DEF_TRAIN_DATA)
