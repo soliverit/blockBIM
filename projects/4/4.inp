@@ -1,0 +1,372 @@
+"SBEM-PROJECT" = GENERAL
+PATH-FILE-INTERFACE = "I:\GreenRock\iSBEM_v4.1.d\Projects\Part 6th Floor North, Royal Exchange Building.nct"
+C-ACCRED-SCHEME = Stroma Accreditation
+B-ADDRESS-1 = "The Royal Exchange"
+C-INS-POL-NUMBER = "0001"
+INTERFACE = iSBEM
+C-QUALIFICATIONS = NOS4
+C-CITY = "Trowbridge"
+LANDMARK-ENVIRONMENT = www
+ACT-NOT = ACT
+C-EMP-TRAD-NAME = "GreenRock Energy"
+B-CITY = "MANCHESTER"
+C-INS-EFF-DATE = "2011-08-01"
+SOFT-COMP-NAME = CLG
+C-POSTCODE = "BA14 9NL"
+B-TYPE = B1 Offices and Workshop businesses
+LIGHT-METERING = 1
+BUILDING-AREA = 193
+C-EMP-TRAD-ADDRESS = "11 Dunkirk Business Park, Southwick, Trowbridge, Wilshire BA14 9NL"
+B-POSTCODE = "M2 7EA"
+C-INS-EXP-DATE = "2012-07-31"
+UPRN = "280523240049"
+INTERFACE-VAL = iSBEM
+C-REG-NUMBER = "STRO000714"
+B-ADDRESS-2 = "Market Street"
+BUILD-ORIENTATION = 0
+ELEC-POWER-FACTOR = <0.9
+C-EMP-TRAD-NUMBER = "<insert Employer/Trading Number>"
+C-NAME = "Jaie Bennett"
+C-INS-PI-LIMIT = "500000"
+C-REG-NUMBER-S = "000000"
+P-NAME = "Part 6th Floor North, Royal Exchange Building"
+HTML-DR-REPORTS = YES
+NOS-LEVEL = Level 3
+C-REL-PART-DISC = Contracted by the owner to provide other Energy Assessment services
+C-TELEPHONE = "0845 3965173"
+B-INSP-DATE = { 2012, 05, 07 }
+INTERFACE-VERSION = v4.1.d
+C-REG-NUMBER-IR = "000000"
+B-ADDRESS-0 = "PART 6TH FLOOR NORTH"
+MAX-STOREY = 1
+C-INSURER = "Insurance"
+TRANSACTION-TYPE = Mandatory issue (Property to let)
+C-ADDRESS = "11 Dunkirk Business Park, Southwick"
+WEATHER = MAN
+ ..
+
+"SBEM" = COMPLIANCE
+EPC-TYPE = EPC England
+ENG-HERITAGE = NO
+BR-STAGE = As built
+AIR-CON-INSTALLED = No
+ ..
+
+"Basic construction for floors" = CONSTRUCTION
+METAL-CLADDING = NO
+CM = { 24.2, 30 }
+U-VALUE = 0.33
+U-VALUE-CORR = NO
+TYPE = U_VALUE
+ ..
+
+"Basic construction for walls" = CONSTRUCTION
+METAL-CLADDING = NO
+CM = { 51, 51 }
+U-VALUE = 0.32
+U-VALUE-CORR = NO
+TYPE = U_VALUE
+ ..
+
+"Basic construction for roofs" = CONSTRUCTION
+METAL-CLADDING = NO
+CM = { 18.04, 18.04 }
+U-VALUE = 0.24
+U-VALUE-CORR = NO
+TYPE = U_VALUE
+ ..
+
+"Stud" = CONSTRUCTION
+METAL-CLADDING = NO
+CM = { 11.7, 11.7 }
+U-VALUE = 0.42
+U-VALUE-CORR = NO
+TYPE = U_VALUE
+ ..
+
+"Basic construction for doors" = CONSTRUCTION
+METAL-CLADDING = NO
+CM = { 15, 30 }
+U-VALUE = 0.4
+U-VALUE-CORR = NO
+TYPE = U_VALUE
+ ..
+
+"Ext" = CONSTRUCTION
+METAL-CLADDING = NO
+CM = { 10, 20 }
+U-VALUE = 1.7
+U-VALUE-CORR = NO
+TYPE = U_VALUE
+ ..
+
+"Int" = CONSTRUCTION
+METAL-CLADDING = NO
+CM = { 10, 20 }
+U-VALUE = 1.7
+U-VALUE-CORR = NO
+TYPE = U_VALUE
+ ..
+
+"Flat Roof" = CONSTRUCTION
+METAL-CLADDING = NO
+CM = { 50.9, 190.9 }
+U-VALUE = 2.8
+U-VALUE-CORR = NO
+TYPE = U_VALUE
+ ..
+
+"Ceiling" = CONSTRUCTION
+METAL-CLADDING = NO
+CM = { 10, 20 }
+U-VALUE = 1
+U-VALUE-CORR = NO
+TYPE = U_VALUE
+ ..
+
+"Floor" = CONSTRUCTION
+METAL-CLADDING = NO
+CM = { 10, 20 }
+U-VALUE = 1
+U-VALUE-CORR = NO
+TYPE = U_VALUE
+ ..
+
+"Basic glazing" = GLASS
+TOT-SOL-TRANS = 0.858
+LIG-SOL-TRANS = 0.898
+U-VALUE = 5.279
+ ..
+
+"Roof Light" = GLASS
+TOT-SOL-TRANS = 0.8
+LIG-SOL-TRANS = 0.8
+U-VALUE = 6.306
+ ..
+
+"Double Metal" = GLASS
+TOT-SOL-TRANS = 0.76
+LIG-SOL-TRANS = 0.8
+U-VALUE = 3.895
+ ..
+
+"IHW" = DHW-GENERATOR
+DHW-GEN-SEFF = 1
+FUEL-TYPE = Grid Supplied Electricity
+STORE-SYSTEM = NO
+ISBEM-ID = 11
+HEAT-GEN-TYPE = Instantaneous hot water only
+ ..
+
+"RADS" = HVAC-SYSTEM
+HEAT-REC-SEFF = 0
+HEAT-GEN-SEFF = 0.815
+SFP-CHECK = NO
+HEAT-REC-VAR-EFF = NO
+FUEL-TYPE = Natural Gas
+EFF-DEFAULT-HEAT = NO
+HEAT-SOURCE = LTHW boiler
+CEN-TIME-CTRL = YES
+COOL-SSEER = 999999
+METERING = 1
+ROOM-TEMP-CTRL = YES
+HEAT-SSEFF = 0.727
+FUEL-TYPE-COOL = Grid Supplied Electricity
+ISBEM-ID = 11
+AUX-ENERGY-CORR = 1
+HEAT-REC-SYSTEM = No heat recovery
+TYPE = Central heating using water: radiators
+VARIABLE-SPEED-PUMP = NO
+CHP = NO
+ ..
+
+"z0/01" = ZONE
+JNCT-JAMB-MC = 1.27
+HEAT-REC-SEFF = 0
+F-CTRL-VENT-DEM = No demand-controlled ventilation
+JNCT-SILL = 0.04
+JNCT-WALL-GRND-MC = 1.15
+Q50-INF = 25
+ACTIVITY = 1005
+JNCT-ROOF-WALL = 0.12
+LIGHT-CONTROL = MANUAL
+HEPA-FILTER = NO
+HEAT-REC-VAR-EFF = NO
+JNCT-JAMB = 0.05
+JNCT-WALL-WALL-MC = 0.25
+DHW-PIPE-LEN = 0
+JNCT-WALL-GRND = 0.16
+LIGHT-DL-AUT-ZONE = YES
+VENT-MECH-EXH = NO
+JNCT-ACCR-DETAIL = { 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+JNCT-WALL-FLR-MC = 0
+LIGHT-CASE = UNKNOWN
+JNCT-WALL-WALL = 0.09
+LIGHT-OCC-SENS-T = NONE
+DESTRAT-FAN = NO
+MULTIPLIER = 1
+JNCT-ACCR-DETAIL-MC = { 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+JNCT-LINTEL-MC = 1.27
+LIGHT-TYPE = T8 Fluorescent - halophosphate - low frequency ballast
+VENT-ZONE-HVAC = ZONE
+ISBEM-ID = 32
+JNCT-WALL-FLR = 0.07
+DHW-GENERATOR = "IHW"
+VENT-SFP = 1.5
+AREA = 192.72
+NIGHT-COOLING = NO
+JNCT-SILL-MC = 1.27
+LIGHT-DISPLAY-EFF = NO
+HEAT-REC-SYSTEM = No heat recovery
+Q-V-TYPE = Natural Supply
+JNCT-LINTEL = 0.3
+JNCT-ROOF-WALL-MC = 0.28
+SFP-TU = 0.8
+HEIGHT = 3.1
+ACTIVITY-NAME = Generic Office Area
+ ..
+
+"z0/01/s" = WALL
+ORIENTATION = South
+TYPE-ENV = Wall
+MULTIPLIER = 1
+LENGTH = 9
+AREA = 27.9
+CONSTRUCTION = "Ext"
+PITCH = 90
+TYPE = Exterior
+ ..
+
+"z0/01/s/g" = WINDOW
+GLASS = "Double Metal"
+SHADING-FACTOR = 1
+ASPECT-RATIO = 0.7
+DEV-PROJ-RATIO = 1
+FRAME-FACTOR = 0.1
+MULTIPLIER = 1
+ROOF-LIGHT-COVER = 1
+AREA = 5.15
+ ..
+
+"z0/01/e" = WALL
+ORIENTATION = East
+TYPE-ENV = Wall
+MULTIPLIER = 1
+LENGTH = 22
+AREA = 68.2
+CONSTRUCTION = "Ext"
+PITCH = 90
+TYPE = Exterior
+ ..
+
+"z0/01/e/g" = WINDOW
+GLASS = "Double Metal"
+SHADING-FACTOR = 1
+ASPECT-RATIO = 0.7
+DEV-PROJ-RATIO = 1
+FRAME-FACTOR = 0.1
+MULTIPLIER = 1
+ROOF-LIGHT-COVER = 1
+AREA = 25.76
+ ..
+
+"z0/01/n" = WALL
+ORIENTATION = North
+TYPE-ENV = Wall
+MULTIPLIER = 1
+LENGTH = 6.6
+AREA = 20.46
+CONSTRUCTION = "Ext"
+PITCH = 90
+TYPE = Exterior
+ ..
+
+"z0/01/n/g" = WINDOW
+GLASS = "Double Metal"
+SHADING-FACTOR = 1
+ASPECT-RATIO = 0.7
+DEV-PROJ-RATIO = 1
+FRAME-FACTOR = 0.1
+MULTIPLIER = 1
+ROOF-LIGHT-COVER = 1
+AREA = 5.15
+ ..
+
+"z0/01/w" = WALL
+ORIENTATION = West
+TYPE-ENV = Wall
+MULTIPLIER = 1
+LENGTH = 22
+AREA = 68.2
+CONSTRUCTION = "Ext"
+PITCH = 90
+TYPE = Exterior
+ ..
+
+"z0/01/w/g" = WINDOW
+GLASS = "Double Metal"
+SHADING-FACTOR = 1
+ASPECT-RATIO = 0.7
+DEV-PROJ-RATIO = 1
+FRAME-FACTOR = 0.1
+MULTIPLIER = 1
+ROOF-LIGHT-COVER = 1
+AREA = 25.76
+ ..
+
+"z0/01/swi" = WALL
+ORIENTATION = South-West
+TYPE-ENV = Wall
+MULTIPLIER = 1
+LENGTH = 6
+AREA = 18.6
+CONSTRUCTION = "Int"
+PITCH = 90
+TYPE = Conditioned adjoining space
+ ..
+
+"z0/01/ci" = WALL
+ORIENTATION = Horizontal
+TYPE-ENV = Floor or Ceiling
+MULTIPLIER = 1
+AREA = 192.72
+CONSTRUCTION = "Ceiling"
+PITCH = 0
+TYPE = Conditioned adjoining space
+ ..
+
+"z0/01/f" = WALL
+ORIENTATION = Horizontal
+TYPE-ENV = Floor or Ceiling
+MULTIPLIER = 1
+AREA = 192.72
+CONSTRUCTION = "Floor"
+PITCH = 0
+TYPE = Conditioned adjoining space
+ ..
+
+"z0/01/ei" = WALL
+ORIENTATION = East
+TYPE-ENV = Wall
+MULTIPLIER = 1
+LENGTH = 2.4
+AREA = 7.44
+CONSTRUCTION = "Stud"
+PITCH = 90
+TYPE = Conditioned adjoining space
+ ..
+
+"z0/01/ni" = WALL
+ORIENTATION = North
+TYPE-ENV = Wall
+MULTIPLIER = 1
+LENGTH = 7.5
+AREA = 23.25
+CONSTRUCTION = "Stud"
+PITCH = 90
+TYPE = Conditioned adjoining space
+ ..
+
+"SBEM-REC" = REC-PROJECT
+ ..
+
