@@ -1,0 +1,53 @@
+allow_absence,base_value,code,key,lower,modifier,object_type,upper,values
+False,Tungsten or Halogen,EPC-L2,LIGHT-TYPE,0.0,match,ZONE,0.0,
+True,,EPC-L2,LAMP-BALLAST-EFF,76.0,range,ZONE,76.0,
+True,,EPC-L2,LIGHT-OUTPUT-RATIO,1.0,atom,ZONE,1.0,
+False,T8 Fluorescent - halophosphate - low frequency ballast|T8 Fluorescent - triphosphor - high frequency ballast,EPC-L5,LIGHT-TYPE,0.0,match,ZONE,0.0,
+True,,EPC-L5,LAMP-BALLAST-EFF,73.0,range,ZONE,73.0,
+True,,EPC-L5,LIGHT-OUTPUT-RATIO,1.0,atom,ZONE,1.0,
+False,Tungsten or Halogen,LIG-HLU,LIGHT-TYPE,0.0,match,ZONE,0.0,
+True,,LIG-HLU,LAMP-BALLAST-EFF,73.0,range,ZONE,73.0,
+True,,LIG-HLU,LIGHT-OUTPUT-RATIO,1.0,atom,ZONE,1.0,
+False,T8 Fluorescent - halophosphate - low frequency ballast|T8 Fluorescent - triphosphor - high frequency ballast,LIG-8LO,LIGHT-TYPE,0.0,match,ZONE,0.0,
+True,,LIG-8LO,LAMP-BALLAST-EFF,73.0,range,ZONE,73.0,
+True,,LIG-HPL,LAMP-BALLAST-EFF,73.0,range,ZONE,73.0,
+True,,LIG-HPL,LIGHT-OUTPUT-RATIO,1.0,atom,ZONE,1.0,
+True,,EPC-L8,LAMP-BALLAST-EFF,70.0,range,ZONE,70.0,
+True,,EPC-L8,LIGHT-OUTPUT-RATIO,1.0,atom,ZONE,1.0,
+True,,EPC-E2,U-VALUE,0.16,range,CONSTRUCTION,0.16,
+True,,EPC-E4,U-VALUE,0.55,range,CONSTRUCTION,0.55,
+True,,EPC-E8,U-VALUE,1.8,range,GLASS,1.8,
+True,,HVC-AFM,SFP,2.2,range,HVAC-SYSTEM,2.2,
+False,YES,HVC-AFM,SFP-CHECK,0.0,string,HVAC-SYSTEM,0.0,YES
+True,,HVC-WET,HEAT-SSEFF,0.86,range,HVAC-SYSTEM,0.86,
+True,,HVC-RAD,RADIANT-EFF,0.65,range,HVAC-SYSTEM,0.65,
+True,,HVC-RAD,HEAT-SSEFF,0.86,range,HVAC-SYSTEM,0.86,
+False,,HVC-RAD,TYPE,0.0,string,HVAC-SYSTEM,0.0,
+True,,EPC-V1,LIG-SOL-TRANS,0.68,range,GLASS,0.68,
+False,LTHW|gas|oil,EPC-H1,HEAT-SOURCE,0.0,match,HVAC-SYSTEM,0.0,
+True,,EPC-H1,HEAT-SSEFF,0.89,range,HVAC-SYSTEM,0.89,
+True,,EPC-H7,HEAT-SSEFF,0.025,increment,HVAC-SYSTEM,0.025,
+True,,EPC-H8,HEAT-SSEFF,0.01,increment,HVAC-SYSTEM,0.01,
+True,,EPC-C2,COOL-GEN-EER,4.3,range,HVAC-SYSTEM,4.3,
+True,,EPC-C2,COOL-SSEER,3.6,range,HVAC-SYSTEM,3.6,
+True,,EPC-C2,COOL-GEN-EER,4.3,range,HVAC-SYSTEM,4.3,
+True,,EPC-C2,COOL-SSEER,3.6,range,HVAC-SYSTEM,3.6,
+True,,EPC-R5,HEAT-SSEFF,4.0,range,HVAC-SYSTEM,4.0,
+False,Split or multi-split system,EPC-R5,TYPE,0.0,string,HVAC-SYSTEM,0.0,Split or multi-split system
+False,Heat pump \(electric\): air source,EPC-R5,HEAT-SOURCE,0.0,string,HVAC-SYSTEM,0.0,Heat pump \(electric\): air source
+True,,EPC-W1,DHW-GEN-SEFF,0.9,range,DHW-GENERATOR,0.9,
+True,Instantaneous hot water only,EPC-W1,HEAT-GEN-TYPE,0.0,filter,DHW-GENERATOR,0.0,
+True,,EPC-W2,DHW-GEN-SEFF,1.0,atom,DHW-GENERATOR,1.0,
+True,,EPC-W2,HEAT-GEN-TYPE,0.0,string,DHW-GENERATOR,0.0,Instantaneous hot water only
+True,Instantaneous hot water only,EPC-W2,HEAT-GEN-TYPE,0.0,filter,DHW-GENERATOR,0.0,
+True,,EPC-W2,FUEL-TYPE,0.0,string,DHW-GENERATOR,0.0,Grid Supplied Electricity
+True,,EPC-W2,STORE-SYSTEM,0.0,string,DHW-GENERATOR,0.0,NO
+True,NO,LIG-PIR,LIGHT-OCC-SENS,0.0,string,ZONE,0.0,YES
+True,,LIG-PIR,LIGHT-PARA-PW-OCC,0.15,atom,ZONE,0.15,
+True,NONE,LIG-PIR,LIG-OCC-SENS-T,0.0,enum,ZONE,0.0,MAN-ON-AUTO-OFF
+True,NO,HVC-DSF,DESTRAT-FAN,0.0,string,ZONE,0.0,YES
+True,industrial|warehouse|retail|sales,HVC-DSF,ACTIVITY-NAME,0.0,match,ZONE,0.0,
+True,radiant,HVC-DSF,TYPE,0.0,parent_filter,ZONE,0.0,
+True,No heat recovery,HVC-AHR,HEAT-REC-SYSTEM,0.0,string,HVAC-SYSTEM,0.0,Thermal wheel
+False,YES,HVC-AHR,SFP=CHECK,0.0,string,HVAC-SYSTEM,0.0,YES
+True,,HVC-AHR,HEAT-REC-SEFF,0.65,atom,HVAC-SYSTEM,0.65,

@@ -46,7 +46,7 @@ class SbemModel(SbemBaseModel):
         self.glasses = SbemObjectSet()    
         self.weath = False
         self.coolIrradianceKeys = False
-        
+ 
         for construction in json["constructions"]:
             cons = SbemConstruction(self,construction)
             self.constructions.append(cons)
@@ -106,12 +106,14 @@ class SbemModel(SbemBaseModel):
                     else:
                         self.features[feature] = Feature(feature, value)
                 except AttributeError as e:
-                    pass
+                    print(e)
             i += 1
         return self.features
     def switchToChosenLightingInputs(self):
         for zone in self.classifiedObjects[SbemZone].objects:
             zone.toChosen()
+    def findObjectByName(self,name):
+        return self.objects.findObject(name)
     ####
     #    IS: There a good reason for these not to use the new (relative to this)
     #        isActive property of these Sbem* classes?
@@ -161,15 +163,19 @@ class SbemModel(SbemBaseModel):
     #    SER and BER methods have case toggled versions for convenience
     ###
     #Standard energy rating
+    def setSER(self, ser):
+        self.ser = ser
+    # @property
+    # def SER(self):
+        # if not self.epcObject:
+            # return None
+        # return self.epcObject.ser()
+    @property
+    def area(self):
+        return self.hvacs.sum("area")
     @property
     def SER(self):
-        if not self.epcObject:
-            return None
-        return self.epcObject.ser()
-    
-    @property
-    def ser(self):
-        return self.SER
+        return self.ser
     
     #Building energy rating
     @property

@@ -31,8 +31,6 @@ print("")
 ##
 environment = Environment.BuildEnvironment()
 environment.printSummary()
-
-if "debug" not in argv:
-	environment.cleanup()
+environment.run()
 
 	

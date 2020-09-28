@@ -121,9 +121,11 @@ class SbemObjectSet():
         return outputs
     #Filter set by object class, returns new self()
     def filterByClass(self,cls):
+        if not isinstance(cls, str):	
+            cls = cls.__class__.__name__
         output = self.__class__()
         for obj in self.objects:
-            if obj.__class__ is cls:
+            if obj.__class__.__name__ == cls:
                 output.append(obj)
         return output
     #Filter by class and property value
@@ -171,6 +173,14 @@ class SbemObjectSet():
     #Find the first instance by property
     def findByProperty(self, property, value):
         for obj in self.objects:
+            if obj[property] == value:
+                print(property)
+                return obj
+        return None
+	#Find the first instance by property
+    def findAllByProperty(self, property, value):
+        for obj in self.objects:
+            print(obj[property])
             if obj[property] == value:
                 return obj
         return None

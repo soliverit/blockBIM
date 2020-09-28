@@ -71,17 +71,17 @@ class SbemObject():
     #Translate class name to SBEM object category
     @classmethod
     def sbemObjectCode(self):
-        """if not self.forcedSbemObjectCode:
-            self.forcedSbemObjectCode = self.codeRegSplit.sub(r'-\1', type(self).__name__.replace("Sbem","")).upper()
-        return self.forcedSbemObjectCode"""
         return self.codeRegSplit.sub(r'-\1', self.__name__.replace("Sbem","")).upper()
-    #Handy printer
+    @property
+    def sbemCode(self):
+        return self.__name__.replace("Sbem","").upper()
+	#Handy printer
     def print(self):
         print("Name:" + self.name)
         print("Area:" + str(self.area))
         print("Props:")
         for k, v in self.props.properties.items():
-            print(v)
+            print("%s\t%s" %(k, v))
     
     # Get an attribute safely
     def safeGet(self, name, default):
