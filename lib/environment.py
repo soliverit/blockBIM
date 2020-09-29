@@ -194,6 +194,7 @@ class Environment():
 		##
 		# Terminate environment
 		##
+		validCommand	= False
 		#Default Command type. Changed or nulled for custom or skip tracking
 		if commandComponents[0].lower() == "exit":
 			self.terminate()
@@ -212,6 +213,7 @@ class Environment():
 					commandComponents[3],
 					float(commandComponents[4]),
 				)
+				validCommand = True
 		##
 		# Disconnect
 		##
@@ -236,6 +238,7 @@ class Environment():
 		elif commandComponents[0].lower() == "listblocks":	
 			for block in self.blockSet.blocks:
 				print(block.filename)
+				track		= False
 		##
 		# List all names of an object type, optional properties
 		##
@@ -253,6 +256,7 @@ class Environment():
 						properties = commandComponents[2].split(",")
 						for property in properties:
 							self.printMessage(object[property], type=property, pad="\t\t")
+				validCommand = True
 			elif commandComponents[1][0].lower() == commandComponents[1][0]:
 				self.printMessage("Object type shouldn't start with lowercase character")
 		
@@ -267,13 +271,16 @@ class Environment():
 		##
 		elif command.lower().startswith("script"):
 			self.doScript(commandComponents)
+			track 			= False
+			validCommand	= True
 		##
 		# Record command:
 		#
 		# Commands recorded if 'commandClass' is still defined as one
 		# of the Command subclasses
 		##
-		if(track):
+		if(track and validCommand):
+			print("HERE")
 			self.blockSet.appendCommand(
 				Command.CommandFromArray(commandComponents)
 			)
@@ -322,13 +329,7 @@ class Environment():
 	# Modify the building
 	##
 	def doModifyCommand(self, objectName, property, value, cost, track=True):
-		##
-		# Track denotes a modification made here to be added to
-		# the next block.
-		##
-		if track:
-			self.printMessage("Staging local modification", "Builder")
-			self.blockSet.appendCommand(Command.CommandFromArray(["modify", objectName,property,value,cost]))
+		
 		self.printMessage("Modifying the building model")
 		self.printMessage("Setting %s of object %s to %s" %(property, objectName, value))
 		sbemObject 				= self.sbemModel.findObjectByName(objectName)
@@ -372,18 +373,17 @@ class Environment():
 				# Consider every distinct block, clone it if it's new
 				##
 				for candidate in set(blockCandidates):
-					candidateName = candidate.split("\\")[-1].split("/")[-1]
-					if not self.blockSet.contains(candidateName):
+					if not self.blockSet.containsBlockFile(candidate):
 						newBlock = self.blockSet.parseBlock(candidate)
 						newBlocks.append(newBlock)
-						self.printMessage("New block found %s" %(candidateName))
+						self.printMessage("New block found %s" %(newBlock.hash), force=True)
 			##
 			# Process new blocks
 			##
 			for newBlock in newBlocks:
-				print(newBlock)
 				for command in newBlock.commands:
 					self.interpretCommand(str(command), track=False)
+			if len(newBlocks) > 0:
 				self.printBuilding()
 				self.printSBEM()
 				__class__.FlushConsole()
@@ -408,8 +408,8 @@ class Environment():
 	##
 	#	Print a message to the console in <type>: <message> format
 	##
-	def printMessage(self, msg, colour=Fore.YELLOW, pad=" ", type="Notification"):
-		if self.silent:
+	def printMessage(self, msg, colour=Fore.YELLOW,  force=False, pad=" ", type="Notification"):
+		if self.silent and not force:
 			return False
 		if type == "Error":
 			colour = Fore.RED
@@ -469,30 +469,30 @@ class Environment():
 	# Print summary
 	##
 	def printSummary(self):
-		print("\t###")
-		print("\t# Name:\t\t\t%s" %(self.name))
-		print("\t# Directories:")
-		print("\t#	Path:\t\t%s" %(self.path))
-		print("\t#	Processing:\t%s" %(self.processingPath))
-		print("\t#	Hot scripts:\t%s" %(self.hotScriptsPath))
-		print("\t#	Local model:\t%s" %(self.modelPath))
-		print("\t#	Base model:\t%s" %(self.baseModelPath))
-		print("\t#	SBEM:\t\t%s" %(__class__.SBEM_ROOT))
-		print("\t#	Train data:\t%s" %(self.trainingDataPath))
+		print("###")
+		print(" # Name:\t\t\t%s" %(self.name))
+		print(" # Directories:")
+		print(" #  Path:\t\t%s" %(self.path))
+		print(" #  Processing:\t%s" %(self.processingPath))
+		print(" #  Hot scripts:\t%s" %(self.hotScriptsPath))
+		print(" #  Local model:\t%s" %(self.modelPath))
+		print(" #  Base model:\t%s" %(self.baseModelPath))
+		print(" #  SBEM:\t\t%s" %(__class__.SBEM_ROOT))
+		print(" #  Train data:\t%s" %(self.trainingDataPath))
 		self.printBuilding()
 		self.printSBEM()
 	def printSBEM(self):
-		print("\t# SBEM:")
-		print("\t#	BER:\t\t%s" %(self.BER))
-		print("\t#	SER:\t\t%s" %(self.SER))
-		print("\t#	Predicted:\t%s" %(self.getCurrentPrediction()))
+		print(" # SBEM:")
+		print(" #  BER:\t\t%s" %(self.BER))
+		print(" #  SER:\t\t%s" %(self.SER))
+		print(" #  Predicted:\t%s" %(self.getCurrentPrediction()))
 	def printBuilding(self):
-		print("\t# Building:")
-		print("\t#	Type:\t\t%s" %(self.sbemModel.general["B-TYPE"]))
-		print("\t#	Area:\t\t%s" %(self.sbemModel.area))
-		print("\t#	Location:\t%s" %(self.sbemModel.general["WEATHER"]))
-		print("\t#	Build Cost:\t%s" %(self.cost))
-		print("\t###")
+		print(" # Building:")
+		print(" #  Type:\t\t%s" %(self.sbemModel.general["B-TYPE"]))
+		print(" #  Area:\t\t%s" %(self.sbemModel.area))
+		print(" #  Location:\t%s" %(self.sbemModel.general["WEATHER"]))
+		print(" #  Build Cost:\t%s" %(self.cost))
+		print(" ###")
 		
 	##
 	# Print features

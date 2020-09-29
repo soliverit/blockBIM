@@ -20,7 +20,7 @@ class BlockSet():
 		for object in self.unwrittenCommands:
 			if object.alias == "modify":
 				cost += object.cost
-		block 		= Block(author, list(self.unwrittenCommands), cost, time())
+		block 		= Block(author, list(self.unwrittenCommands), cost, str(time()))
 		block.write(self.path)
 		self.blocks.append(block)
 		
@@ -49,7 +49,7 @@ class BlockSet():
 	##
 
 	def parseBlock(self, path):
-		if self.contains(Block.NameFromPath(path)):
+		if self.contains(Block.NameFromPath(path).replace(".blk", "")):
 			return False
 		block 	= Block.Read(path)
 		block.write(self.path)
@@ -57,12 +57,17 @@ class BlockSet():
 		return block
 		
 	##
-	#	Set has block with this filename
+	# Does set contain items with filename
 	##
-	def contains(self, name):
+	def containsBlockFile(self, path):
+		return self.contains(Block.NameFromPath(path).replace(".blk", ""))
+	##
+	# Set contains item with hash
+	##
+	def contains(self, hash):
 		for block in self.blocks:
-			if block.filename == name:
-				return True
+			if block.hash == hash:
+				return True				
 	##
 	# Get block by name
 	##

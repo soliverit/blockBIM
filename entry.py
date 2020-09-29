@@ -30,7 +30,7 @@ print("")
 # Create a new 
 ##
 environment = Environment.BuildEnvironment()
-if "silen" in argv:
+if "silent" in argv:
 	environment.silent = True
 environment.printSummary()
 

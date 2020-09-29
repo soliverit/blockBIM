@@ -20,18 +20,18 @@ class Command():
 			if command[i] == '"':
 				i 				+= 1
 				lastPostition 	= i 
-				while command[i] != '"':
+				while i < len(command) and  command[i] != '"':
 					i+= 1
 				output.append(command[lastPostition: i])
 				i 				+= 1
 				lastPostition 	= i
-			elif command[i] == ' ':
+			elif i < len(command) and command[i] == ' ' :
 				output.append(command[lastPostition: i])
 				lastPostition = i + 1
 			i += 1
 		output.append(command[lastPostition: i])
 		
-		return [ val.strip() for val in output]
+		return [ val.strip() for val in output if val !=""]
 	def __init__(self, parameters):
 		self.parameters = parameters
 	def __str__(self):

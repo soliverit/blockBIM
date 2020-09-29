@@ -13,8 +13,7 @@ class Block():
 		with open(blockPath, "r") as blockFile:
 			hash 		= blockFile.readline().strip()
 			author 		= blockFile.readline().strip()
-			line 		= blockFile.readline().strip()
-			costDelta	= float(line)
+			costDelta	= float(blockFile.readline().strip())
 			timestamp	= blockFile.readline().strip()
 			updates		= []
 			while(True):
@@ -49,9 +48,7 @@ Filename:	%s
 		self.timestamp	= timestamp
 	@property
 	def hash(self):
-		return sha1("".join([self.author,
-			self.dataString]
-		).encode("utf-8")).hexdigest()[0:25]
+		return str(sha1("".join([self.author,self.dataString]).encode("utf-8")).hexdigest()[0:25])
 	@property
 	def dataString(self):
 		return "\n".join([str(command) for command in self.commands])
@@ -75,5 +72,4 @@ Filename:	%s
 				self.costDelta, 
 				self.timestamp
 				))
-			for command in self.commands:
-				blockFile.write("%s\n" %(str(command)))
+			blockFile.write(self.dataString)
