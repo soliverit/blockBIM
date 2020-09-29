@@ -3,6 +3,7 @@ from time 				import time
 from random 			import randint
 #Project
 from .commands.command	import Command
+from hashlib			import sha1
 ##
 # Block
 ##
@@ -20,41 +21,59 @@ class Block():
 				cmd = blockFile.readline().strip()
 				if not len(cmd):
 					break
-				commandComponents 	= __class__.CommandToArray(cmd)
-				commandClass		= Command.ClassFromString(commandComponents[0])
-				updates.append(commandClass(commandComponents))
+				commandComponents 	= Command.CommandToArray(cmd)
+				command				= Command.CommandFromArray(commandComponents)
+				updates.append(command)
 			
-			return __class__(author, blockPath, hash, updates, costDelta, timestamp)
+			return __class__(author, updates, costDelta, timestamp)
 	@staticmethod
 	def NameFromPath(path):
 		return path.split("\\")[-1].split("/")[-1]
 	def __str__(self):
-		print("""
+		return"""
 Hash:		%s
 Time:		%s
 CostDelta:	%s	
 Data:
 	%s
-		"""
-			%(self.hash, self.timestamp, self.costDelta, "\n\t".join(self.data))
-		)
-	def __init__(self, author, filename, hash, data, costDelta, timestamp=time()):
+Filename:	%s
+		"""			%(self.hash, 
+						self.timestamp, 
+						self.costDelta, 
+						"\n\t".join([str(c) for c in self.commands]),
+						self.filename)
+		
+	def __init__(self, author, commands, costDelta, timestamp):
 		self.author		= author
-		self.path		= filename
-		self.data		= data
-		self.hash		= hash
-		self.costDelta	= float(costDelta)
+		self.commands	= commands
 		self.timestamp	= timestamp
 	@property
+	def hash(self):
+		return sha1("".join([self.author,
+			self.dataString]
+		).encode("utf-8")).hexdigest()[0:25]
+	@property
+	def dataString(self):
+		return "\n".join([str(command) for command in self.commands])
+	@property
 	def filename(self):
-		return __class__.NameFromPath(self.path)
+		return "%s.blk" %(self.hash)
+	@property 
+	def costDelta(self):
+		cost = 0
+		for command in self.commands:
+			if command.alias == "modify":
+				cost += command.cost
+		return cost
+	def writePath(self, path):
+		return "%s%s" %(path, self.filename)
 	def write(self, path):
-		with open(path, "w") as blockFile:
+		with open(self.writePath(path), "w") as blockFile:
 			blockFile.write("%s\n%s\n%s\n%s\n" 
 				%(self.hash, 
 				self.author, 
 				self.costDelta, 
 				self.timestamp
 				))
-			for modification in self.data:
-				file.write("%s\n" %(str(data)))
+			for command in self.commands:
+				blockFile.write("%s\n" %(str(command)))

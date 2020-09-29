@@ -9,7 +9,9 @@ from os			import getcwd
 from shutil		import rmtree, copyfile
 from pandas		import read_csv
 from time		import sleep
-from threading	import Thread
+from sys		import stdout
+from glob 		import glob
+import _thread
 from colorama 	import init, Fore, Back, Style
 init()
 #Project
@@ -18,8 +20,7 @@ from lib.machine					import Machine
 from lib.block_set					import BlockSet
 from lib.receiver					import Receiver
 
-from lib.commands.modification		import Modification
-from lib.commands.common			import Common
+from lib.commands.command			import Command
 
 ############
 #	Distributed 
@@ -50,7 +51,7 @@ class Environment():
 	DEF_TRAIN_DATA	= "%stemp.csv" %(DATA_ROOT)
 	
 	#Block stuff
-	GENESIS_NAME	= "genesis.blk"
+	GENESIS_NAME	= "2cfc750a06c2616ceb8facdf5.blk"
 	GENESIS_PATH	= "%s%s" %(CONFIGS_ROOT, GENESIS_NAME)
 	##
 	# Machine learning stuff
@@ -66,6 +67,14 @@ class Environment():
 	# Misc
 	##
 	INPUT_MESSAGE	= ">"
+	
+	##
+	# Cheesy Flush console method
+	##
+	def FlushConsole():
+		print("> ", end="")
+		stdout.flush()
+		
 	##
 	#	Build a Saleh-ML Environment (static)
 	#
@@ -81,8 +90,6 @@ class Environment():
 		env.createRepository()
 		print("BuildEnvironment: Creating local inp model copy")
 		env.saveLocalModel()
-		print("BuildEnvironment: Loading block history")
-		env.blockSet.scan()
 		print("BuildEnvironment: Parsing feature list")
 		with open(__class__.FEATURES_PATH) as featuresFile:
 			for line in featuresFile:
@@ -131,30 +138,7 @@ class Environment():
 				print("ID %s not found in PROJECT_ROOT '%s'" %(id, __class__.PROJECT_ROOT))
 			except:
 				print("ENV::GetModelID - Unknown Error")
-	##
-	# Convert command string into array
-	##
-	@staticmethod
-	def CommandToArray(command):
-		output 			= []
-		i 				= 0
-		lastPostition	= 0
-		while(i < len(command)):
-			if command[i] == '"':
-				i 				+= 1
-				lastPostition 	= i 
-				while command[i] != '"':
-					i+= 1
-				output.append(command[lastPostition: i])
-				i 				+= 1
-				lastPostition 	= i
-			elif command[i] == ' ':
-				output.append(command[lastPostition: i])
-				lastPostition = i + 1
-			i += 1
-		output.append(command[lastPostition: i])
-		
-		return [ val.strip() for val in output]
+	
 	##
 	# Initialise
 	#
@@ -170,22 +154,29 @@ class Environment():
 		self.sbemModel	= __class__.LoadSbemModel(self.baseModelPath)
 		for zone in self.sbemModel.objects.filterByClass("SbemZone"):
 			zone.toChosen()
-		self.regressor	= __class__.CreateRegressor(self.trainingDataPath)
-		self.features	= []
-		self.blockSet	= BlockSet(self.blocksPath)	
-		self.receiver	= Receiver(__class__.ENV_ROOT, self.modelID)
-		res 			= self.getBaseEPCResults()
-		self.SER		= res["SER"]
-		self.BER		= res["BER"]
-		self.sbemModel.setSER(self.SER)
+		self.regressor			= __class__.CreateRegressor(self.trainingDataPath)
+		self.features			= []
+		self.blockSet			= BlockSet(self.blocksPath)	
+		self.receiver			= Receiver(__class__.ENV_ROOT, self.modelID)
 		#Kill processes
-		self.exit		= False
+		self.exit				= False
 		#Leave trail of your actions
-		self.debug		= False
+		self.debug				= False
 		#Listening for broadcasts
-		self.connected	= True
+		self.connected			= True
 		#Hot script thread
 		self.hotScriptThread	= False
+		#Network events thread
+		self.networkEventsThread= False
+		#Print message passed to self.printMessage
+		self.silent				= False
+		##
+		# Do model prep
+		##
+		res 					= self.getBaseEPCResults()
+		self.SER				= res["SER"]
+		self.BER				= res["BER"]
+		self.sbemModel.setSER(self.SER)
 	##
 	# Pop a cap in the processor's... Terminate the environment
 	##
@@ -199,14 +190,14 @@ class Environment():
 	##
 	def interpretCommand(self, command, track=True):
 		
-		commandComponents = __class__.CommandToArray(command)
+		commandComponents = Command.CommandToArray(command)
 		##
 		# Terminate environment
 		##
 		#Default Command type. Changed or nulled for custom or skip tracking
-		commandClass		= Common
 		if commandComponents[0].lower() == "exit":
 			self.terminate()
+			track=False
 		##
 		# Modify object command
 		##
@@ -219,30 +210,32 @@ class Environment():
 					commandComponents[1],
 					commandComponents[2],
 					commandComponents[3],
-					commandComponents[4],
+					float(commandComponents[4]),
 				)
-				commandClass = Modification
 		##
 		# Disconnect
 		##
 		elif commandComponents[0].lower() == "disconnect":
 			self.printMessage("Disconnecting", "Network")
 			self.connected 	= False
-			commandClass	= False
+			track			= False
 		##
 		# Generate next block
 		##
 		elif commandComponents[0].lower() == "broadcast":
 			self.printMessage("Processing next Block", "Broadcast")
-			generated = self.blockSet.generateNextBlock()
-			commandClass	= False
+			generated 		= self.blockSet.generateNextBlock(self.name)
+			track			= False
 		##
 		# Connect
 		##
 		elif commandComponents[0].lower() == "connect":
 			self.printMessage("Connecting", "Network")
 			self.connected 	= True
-			commandClass	= False
+			track			= False
+		elif commandComponents[0].lower() == "listblocks":	
+			for block in self.blockSet.blocks:
+				print(block.filename)
 		##
 		# List all names of an object type, optional properties
 		##
@@ -260,15 +253,15 @@ class Environment():
 						properties = commandComponents[2].split(",")
 						for property in properties:
 							self.printMessage(object[property], type=property, pad="\t\t")
-					print("\t=====================\n")
 			elif commandComponents[1][0].lower() == commandComponents[1][0]:
 				self.printMessage("Object type shouldn't start with lowercase character")
+		
 		##
 		# Broadcast
 		##
-		elif command.lower.startswith("broadcast"):
+		elif command.lower().startswith("broadcast"):
 			self.doBroadcast()
-			commandClass	= False
+			track	= False
 		##
 		# Run an external script
 		##
@@ -280,8 +273,10 @@ class Environment():
 		# Commands recorded if 'commandClass' is still defined as one
 		# of the Command subclasses
 		##
-		if(commandClass):
-			self.blockSet.appendCommand(commandClass(commandComponents))
+		if(track):
+			self.blockSet.appendCommand(
+				Command.CommandFromArray(commandComponents)
+			)
 	##
 	# Create block for retrieval by anyone on the network
 	##
@@ -310,7 +305,7 @@ class Environment():
 				self.interpretCommand(line)
 		print("======= /%s ======" %(scriptComponents[0]))
 		return True
-	def hotScriptHandler(self):
+	def hotScriptHandler(self, threadName):
 		##
 		# Do until told to exit
 		## 
@@ -333,7 +328,7 @@ class Environment():
 		##
 		if track:
 			self.printMessage("Staging local modification", "Builder")
-			self.blockSet.appendModification(objectName, property, value, cost)
+			self.blockSet.appendCommand(Command.CommandFromArray(["modify", objectName,property,value,cost]))
 		self.printMessage("Modifying the building model")
 		self.printMessage("Setting %s of object %s to %s" %(property, objectName, value))
 		sbemObject 				= self.sbemModel.findObjectByName(objectName)
@@ -341,7 +336,7 @@ class Environment():
 		##
 		# Print update
 		##
-		self.printMessage("%skgC2/m²" %(self.getCurrentPrediction()),
+		self.printMessage("%skgC2/m²" %(self.getCurrentPrediction().round(1)),
 			type="BER update",
 			colour=Fore.WHITE)
 		self.printMessage(self.cost,
@@ -350,7 +345,8 @@ class Environment():
 	##
 	# Do network communication (Is Threaded somewhere)
 	##
-	def doNetworkEvents(self, command):
+	def doNetworkEvents(self, threadName):
+		__class__.FlushConsole()
 		##
 		# Continue handling network requests until told otherwise
 		##
@@ -362,7 +358,7 @@ class Environment():
 			##
 			# Check if we're wanting to communicate
 			##
-			if not self.connect:
+			if not self.connected:
 				continue
 			##
 			# Receiver and process blocks
@@ -370,6 +366,7 @@ class Environment():
 			#Listen for blocks on any node
 			blockCandidates = self.receiver.scan()
 			#Any new block(s) found
+			newBlocks		= []
 			if blockCandidates:
 				##
 				# Consider every distinct block, clone it if it's new
@@ -377,12 +374,20 @@ class Environment():
 				for candidate in set(blockCandidates):
 					candidateName = candidate.split("\\")[-1].split("/")[-1]
 					if not self.blockSet.contains(candidateName):
+						newBlock = self.blockSet.parseBlock(candidate)
+						newBlocks.append(newBlock)
 						self.printMessage("New block found %s" %(candidateName))
-						self.blockSet.parseBlock(candidate)
-			# Scan block directory for unprocessed Blocks
-			newBlocks	= self.blockSet.scan()
+			##
+			# Process new blocks
+			##
 			for newBlock in newBlocks:
 				print(newBlock)
+				for command in newBlock.commands:
+					self.interpretCommand(str(command), track=False)
+				self.printBuilding()
+				self.printSBEM()
+				__class__.FlushConsole()
+			
 				
 	##======================
 	# Where the action happens!
@@ -395,8 +400,8 @@ class Environment():
 		# MOOSBEM interface v1.0 #
 		###'                  ####
 		""",type="", colour=Fore.WHITE)
-		self.commandLineThread 	= Thread(target=self.interpretCommand)
-		self.hotScriptThread 	= Thread(target=self.hotScriptHandler)
+		self.hotScriptThread 		= _thread.start_new_thread(self.hotScriptHandler, ("hot_script",))
+		self.networkEventsThread	= _thread.start_new_thread(self.doNetworkEvents, ("netowrk_events",))
 		while(not self.exit):
 			command = input(">")
 			self.interpretCommand(command,track=True)
@@ -404,6 +409,8 @@ class Environment():
 	#	Print a message to the console in <type>: <message> format
 	##
 	def printMessage(self, msg, colour=Fore.YELLOW, pad=" ", type="Notification"):
+		if self.silent:
+			return False
 		if type == "Error":
 			colour = Fore.RED
 		print("%s%s:\t%s%s%s" %(pad,type, colour, msg, Fore.RESET))
@@ -472,10 +479,14 @@ class Environment():
 		print("\t#	Base model:\t%s" %(self.baseModelPath))
 		print("\t#	SBEM:\t\t%s" %(__class__.SBEM_ROOT))
 		print("\t#	Train data:\t%s" %(self.trainingDataPath))
+		self.printBuilding()
+		self.printSBEM()
+	def printSBEM(self):
 		print("\t# SBEM:")
 		print("\t#	BER:\t\t%s" %(self.BER))
 		print("\t#	SER:\t\t%s" %(self.SER))
 		print("\t#	Predicted:\t%s" %(self.getCurrentPrediction()))
+	def printBuilding(self):
 		print("\t# Building:")
 		print("\t#	Type:\t\t%s" %(self.sbemModel.general["B-TYPE"]))
 		print("\t#	Area:\t\t%s" %(self.sbemModel.area))

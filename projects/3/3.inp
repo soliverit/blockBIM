@@ -54,38 +54,6 @@ AIR-CON-INSTALLED = Yes
 AIR-CON-KW = Between 12kW and 250kW
  ..
 
-"Basic construction for doors" = CONSTRUCTION
-METAL-CLADDING = NO
-CM = { 15, 30 }
-U-VALUE = 0.4
-U-VALUE-CORR = NO
-TYPE = U_VALUE
- ..
-
-"Basic construction for walls" = CONSTRUCTION
-METAL-CLADDING = NO
-CM = { 51, 51 }
-U-VALUE = 0.32
-U-VALUE-CORR = NO
-TYPE = U_VALUE
- ..
-
-"Basic construction for roofs" = CONSTRUCTION
-METAL-CLADDING = NO
-CM = { 18.04, 18.04 }
-U-VALUE = 0.24
-U-VALUE-CORR = NO
-TYPE = U_VALUE
- ..
-
-"Basic construction for floors" = CONSTRUCTION
-METAL-CLADDING = NO
-CM = { 24.2, 30 }
-U-VALUE = 0.33
-U-VALUE-CORR = NO
-TYPE = U_VALUE
- ..
-
 "Door" = CONSTRUCTION
 METAL-CLADDING = NO
 CM = { 11.25, 11.25 }
