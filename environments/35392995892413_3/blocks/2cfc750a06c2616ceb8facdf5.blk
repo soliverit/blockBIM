@@ -1,9 +1,0 @@
-2cfc750a06c2616ceb8facdf5
-TheCreator
-175000.0
-1601237123
-"modify" "A/C" "HEAT-SSEFF" "3.66" "50000"
-"modify" "Pitched" "U-VALUE" "0.35" "30000"
-"modify" "Z0/01" "LAMP-BALLAST-EFF" "33" "40000"
-"modify" "Ext" "U-VALUE" "0.65" "30000"
-"modify" "R/L" "U-VALUE" "2.664" "25000"

@@ -1,0 +1,10 @@
+##
+# Glazing modifications
+##
+#Replace aluminium single with double
+#glazing equivalent 
+modify A/S U-VALUE 2.2 20000
+#Low emissivity coating
+modify A/S TOT-SOL-TRANS 0.68 5000
+#Increase A/S glazing area
+modify Z0/01/ne/g AREA 15 2000

@@ -1,0 +1,8 @@
+##
+# HVAC modification
+##
+#Change heating fuel from natural gas to biogas
+modify Rads FUEL-TYPE Biogas 12000
+#Improve current boiler efficiency
+modify Rads HEAT-SSEFF 0.83 5000
+

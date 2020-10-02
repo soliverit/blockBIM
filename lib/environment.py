@@ -107,8 +107,8 @@ class Environment():
 	def CreateRegressor(inputDataPath):
 		data = read_csv(inputDataPath)
 		return Machine(
-			data[int(len(data) * 0.9):],
-			data[: int(len(data) * 0.9)],
+			data[int(len(data) * 0.5):],
+			data[: int(len(data) * 0.5)],
 			__class__.TARGET, 
 			__class__.PARAMETERS
 		)
@@ -190,6 +190,8 @@ class Environment():
 	##
 	def interpretCommand(self, command, track=True):
 		
+		if command.replace(" ","").replace("\t","").replace("\n","") == "":
+			return False
 		commandComponents = Command.CommandToArray(command)
 		##
 		# Terminate environment
@@ -199,6 +201,11 @@ class Environment():
 		if commandComponents[0].lower() == "exit":
 			self.terminate()
 			track=False
+		##
+		# Print help
+		##
+		if commandComponents[0].lower() == "help":
+			self.printHelp()
 		##
 		# Modify object command
 		##
@@ -259,7 +266,14 @@ class Environment():
 				validCommand = True
 			elif commandComponents[1][0].lower() == commandComponents[1][0]:
 				self.printMessage("Object type shouldn't start with lowercase character")
-		
+		##
+		# List static scripts
+		##
+		elif commandComponents[0].lower() == "listscripts":
+			print("\t### Listing static scripts ###")
+			for path in glob(__class__.SCRIPTS_ROOT + "*"):
+				print("\t%s" %(path.split("\\")[-1].split("/")[-1]))
+			track=False
 		##
 		# Broadcast
 		##
@@ -270,9 +284,47 @@ class Environment():
 		# Run an external script
 		##
 		elif command.lower().startswith("script"):
+			if len(commandComponents) == 3:
+				self.interpretCommand("ps %s" %(commandComponents[1]))
 			self.doScript(commandComponents)
 			track 			= False
 			validCommand	= True
+		##
+		# Write message
+		##
+		elif commandComponents[0].lower() == "chat":
+			self.printMessage("\t%s SAYS: %s" %(self.name, " ".join(commandComponents[1: ])), type=Fore.WHITE +"Communication" + Fore.RESET, colour=Fore.YELLOW)
+			track 			= True
+			validCommand	= True
+			
+		##
+		# Print the contents of a script
+		##
+		elif commandComponents[0].lower() == "ps" or command.lower().startswith("printscript"):
+			if len(commandComponents) < 2:
+				self.printMessage("Print Script requires one input parameter", "Error")
+				return False
+			pScriptPath = self.createScriptPath(commandComponents[1])
+			if not exists(pScriptPath):
+				self.printMessage("Script '%s' for printing not found", "Error")
+				return False
+			with open(pScriptPath) as scriptFile:
+				print("%s>>>>>> Print Script (%s)%s" %(Fore.WHITE, pScriptPath, Fore.RESET))
+				
+				for line in scriptFile:
+					
+					if line.strip().startswith("#"):
+						fore = Fore.YELLOW
+					else:
+						fore = Fore.RESET
+						
+					print("%s>>%s\t%s%s%s" %(Fore.WHITE,
+						Fore.RESET,
+						fore,
+						line.strip(),
+						Fore.RESET))
+			track = True
+		__class__.FlushConsole()
 		##
 		# Record command:
 		#
@@ -280,10 +332,10 @@ class Environment():
 		# of the Command subclasses
 		##
 		if(track and validCommand):
-			print("HERE")
 			self.blockSet.appendCommand(
 				Command.CommandFromArray(commandComponents)
 			)
+		
 	##
 	# Create block for retrieval by anyone on the network
 	##
@@ -309,16 +361,20 @@ class Environment():
 		##
 		with open(scriptPath) as script:
 			for line in script:
-				self.interpretCommand(line)
+				if not line.strip().startswith("#"):
+					self.interpretCommand(line)
 		print("======= /%s ======" %(scriptComponents[0]))
 		return True
 	def hotScriptHandler(self, threadName):
+		print(Fore.WHITE + "\t### Hotscript event handler ###" + Fore.RESET)
+		__class__.FlushConsole()
 		##
 		# Do until told to exit
 		## 
 		while(not self.exit):
 			sleep(2)
 			for path in glob(self.hotScriptsPath + "*"):
+				self.printMessage("Found script", type="Hotscript", colour=Fore.CYAN)
 				##
 				# Read the script and process
 				##
@@ -337,7 +393,7 @@ class Environment():
 		##
 		# Print update
 		##
-		self.printMessage("%skgC2/m²" %(self.getCurrentPrediction().round(1)),
+		self.printMessage("%skgCO2/m²" %(self.getCurrentPrediction().round(1)),
 			type="BER update",
 			colour=Fore.WHITE)
 		self.printMessage(self.cost,
@@ -376,7 +432,7 @@ class Environment():
 					if not self.blockSet.containsBlockFile(candidate):
 						newBlock = self.blockSet.parseBlock(candidate)
 						newBlocks.append(newBlock)
-						self.printMessage("New block found %s" %(newBlock.hash), force=True)
+						self.printMessage("New block found %s" %(newBlock.hash),pad="\n", force=True)
 			##
 			# Process new blocks
 			##
@@ -465,6 +521,42 @@ class Environment():
 	##
 	def cleanup(self):
 		rmtree(self.path)
+	def printHelp(self):
+		print("""
+#################################################
+#   DCE-MOOSBEM V1.0                            #
+#                                               #
+#   Welcome to DCE-MOOSBEM, the decentralised	#
+#   common data environment for the MOOSBEM     #
+#   gradient boosting regressor estimator for   #
+#   the Simplified Building Energy Model        #
+#                                               #
+# Functions:                                    #
+#   broadcast:	Generate a new block from       #
+#               your changes                    #
+#   connect:    Connect to the network          #
+#   disconnect:	Disconnect from network	        #
+#   exit:       Terminate the service           #
+#   help:       Print this help message         #
+#   list:       List objects                    #
+#       Type:  HvacSystem, Construction, etc    #
+#       Props: Comma delimited list of          #
+#              SbemObject properties, AREA,     #
+#              U-VALUE,<custom property>, etc   #
+#   listBlocks: List all block names            #
+#   modify:    Update the value of a property   #
+#              an SbemObject with cost change   #
+#       Name:     SBEM object name              #	
+#       Property: SBEM object property name     #	
+#       Value:    New value                     #
+#       Cost:     Change to cost                #
+#   printscript:  Print a script's content      #
+#       Script:  Name of the script             #
+#   ps:       As printscript                    #
+#   script:   Run a script from the scripts dir	#
+#      Name:     Name of the script             #
+#################################################
+		""")
 	##
 	# Print summary
 	##
@@ -473,10 +565,10 @@ class Environment():
 		print(" # Name:\t\t\t%s" %(self.name))
 		print(" # Directories:")
 		print(" #  Path:\t\t%s" %(self.path))
-		print(" #  Processing:\t%s" %(self.processingPath))
+		print(" #  Processing:\t\t%s" %(self.processingPath))
 		print(" #  Hot scripts:\t%s" %(self.hotScriptsPath))
 		print(" #  Local model:\t%s" %(self.modelPath))
-		print(" #  Base model:\t%s" %(self.baseModelPath))
+		print(" #  Base model:\t\t%s" %(self.baseModelPath))
 		print(" #  SBEM:\t\t%s" %(__class__.SBEM_ROOT))
 		print(" #  Train data:\t%s" %(self.trainingDataPath))
 		self.printBuilding()
@@ -485,7 +577,7 @@ class Environment():
 		print(" # SBEM:")
 		print(" #  BER:\t\t%s" %(self.BER))
 		print(" #  SER:\t\t%s" %(self.SER))
-		print(" #  Predicted:\t%s" %(self.getCurrentPrediction()))
+		print(" #  Current BER:\t%s" %(self.getCurrentPrediction()))
 	def printBuilding(self):
 		print(" # Building:")
 		print(" #  Type:\t\t%s" %(self.sbemModel.general["B-TYPE"]))

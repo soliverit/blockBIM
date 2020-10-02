@@ -1,1 +1,1 @@
-python entry.py fresh silent
+python entry.py fresh

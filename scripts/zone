@@ -1,0 +1,10 @@
+##
+# Zone modification
+##
+#Change zone function
+modify Z0/01 ACTIVITY-NAME "Generic Office" 0
+modify Z0/01 ACTIVITY 1078 20000
+#Improve lighting efficacy
+modify Z0/01 LAMP-BALLAST-EFF 60 3000
+#Install lighting controls, occupancy + manual on/off
+modify Z0/01 LIGHT-OCC-SENS-T MAN-ON-AUTO-OFF 1000

@@ -109,7 +109,7 @@ class SbemZone(SbemObject):
     
     @property
     def occsensor(self):
-        value = self.OCC_SENSOR_FACTORS[self["LIGHT-OCC-SENS-T"]] if "LIGHT-CC-SENS-T" in self else None
+        value = self.OCC_SENSOR_FACTORS[self["LIGHT-OCC-SENS-T"]] 
         if not value:
             value = 1
         return value
