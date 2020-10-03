@@ -78,7 +78,7 @@ class BaseEnvironment():
 	#	return Environment
 	##
 	@classmethod
-	def BuildEnvironment(self):
+	def BuildEnvironment(self, withRegressor=False):
 		name 	= str(randint(10000000, 100000000000000))
 		id		= __class__.GetModelID()
 		env		= self(name, id)
@@ -92,7 +92,8 @@ class BaseEnvironment():
 			for line in featuresFile:
 				env.addFeature(line.strip())
 		print("BuildEnvironment: Training Regressor")
-		env.regressor.train()
+		if withRegressor:
+			env.buildRegressor(trainNow=True)
 		print("BuildEnvironment: Finished")
 		print("####################################################\n")
 		
@@ -152,7 +153,6 @@ class BaseEnvironment():
 		##
 		self.model				= self.__class__.LoadModel(self.baseModelPath)
 		
-		self.regressor			= self.__class__.CreateRegressor(self.trainingDataPath)
 		self.features			= []
 		self.blockSet			= BlockSet(self.blocksPath)	
 		self.receiver			= Receiver(__class__.ENV_ROOT, self.modelID)
@@ -168,6 +168,21 @@ class BaseEnvironment():
 		self.networkEventsThread= False
 		#Print message passed to self.printMessage
 		self.silent				= False
+		#
+		self.regressor			= False
+	##
+	# Build instance regressor
+	##
+	def buildRegressor(self, trainNow=True):
+		##
+		# Build ML model if expected.
+		#
+		#	THIS might be done better but I'm no sure how
+		#	at the moment. Wonder how many models will use it
+		##
+		self.regressor			= self.__class__.CreateRegressor(self.trainingDataPath)
+		if trainNow:
+			self.regressor.train()
 	##
 	# Pop a cap in the processor's... Terminate the environment
 	##

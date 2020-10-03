@@ -1,10 +1,10 @@
 ### Includes ###
 ##-Native
-from sys 				import argv
+from sys 					import argv
 #Command line runnererererer...
-from os 				import system
+from os 					import system
 ##-Project
-from lib.environment 	import Environment
+from lib.sbem_environment 	import SBEMEnvironment
 ##
 # Arg preprocesses
 ##
@@ -29,7 +29,7 @@ print("")
 ##
 # Create a new 
 ##
-environment = Environment.BuildEnvironment()
+environment = SBEMEnvironment.BuildEnvironment(withRegressor=True)
 if "silent" in argv:
 	environment.silent = True
 environment.printSummary()
