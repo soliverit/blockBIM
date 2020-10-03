@@ -1,9 +1,11 @@
-from .sbem_object import SbemObject
-from .sbem_object_set import SbemObjectSet
-from .sbem_wall import SbemWall
-from .petites import readCSV
+#Native
+from decimal 			import Decimal
+#Project
+from .sbem_object 		import SbemObject
+from .sbem_object_set 	import SbemObjectSet
+from .sbem_wall 		import SbemWall
+from ..petites			import readCSV
 
-from decimal import Decimal
 
 class SbemZone(SbemObject):
     ACTIVITY_CACHE = {}

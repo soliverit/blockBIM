@@ -1,5 +1,5 @@
-from .sbem_object import SbemObject
-from .sbem_wall import SbemWall
+from .sbem_object		import SbemObject
+from .sbem_wall 		import SbemWall
 
 class SbemConstruction(SbemObject):
     def __init__(self, sbemModel, json):

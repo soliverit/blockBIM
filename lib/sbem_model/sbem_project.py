@@ -1,5 +1,5 @@
-from .sbem_inp_model import *
-from .sbem_epc_model import *
+from .sbem_inp_model import SbemInpModel
+from .sbem_epc_model import SbemEpcModel
 ##### Sbem Project ######
 # Simple project for grouping inputs and outputs from SBEM
 class SbemProject():

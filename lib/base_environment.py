@@ -121,8 +121,6 @@ class BaseEnvironment():
 	def LoadModel(self, path):
 		model = False
 		with open(path) as file:
-			print(self.__name__)
-			print(self.__class__)
 			model = self.MODEL_CLASS(file.read())
 		return model
 	##

@@ -1,10 +1,11 @@
-from .sbem_hvac_system import *
-from .sbem_general import *
-from .sbem_compliance import *
-from .sbem_construction import *
-from .sbem_dhw_generator import *
-from .sbem_glass import *
-from .feature import *
+from .sbem_hvac_system 		import SbemHvacSystem
+from .sbem_general 			import SbemGeneral
+from .sbem_compliance 		import SbemCompliance
+from .sbem_construction 	import SbemConstruction
+from .sbem_dhw_generator	import SbemDhwGenerator
+from .sbem_glass 			import SbemGlass
+from .sbem_object_set		import SbemObjectSet
+from ..feature				import Feature
 import pandas as pd
 
 class SbemBaseModel():

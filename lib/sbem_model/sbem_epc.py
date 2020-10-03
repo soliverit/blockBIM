@@ -1,4 +1,4 @@
-from lib.sbem_model.sbem_object import *
+from .sbem_object import SbemObject
 class SbemEpc(SbemObject):
 	def __init__(self, sbemModel, props):
 		super(self.__class__,self).__init__(sbemModel, props)

@@ -1,5 +1,5 @@
-from .sbem_object import *
-from .petites import importClassByName
+from .sbem_object 	import SbemObject
+from ..petites 		import importClassByName
 
 class SbemWindow(SbemObject):
     def __init__(self, sbemModel, json):

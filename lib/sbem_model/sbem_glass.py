@@ -1,4 +1,4 @@
-from .sbem_object import *
+from .sbem_object import SbemObject
 
 class SbemGlass(SbemObject):
     def __init__(self, sbemModel, json):

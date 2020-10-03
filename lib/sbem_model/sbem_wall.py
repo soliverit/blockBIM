@@ -1,7 +1,7 @@
-from .sbem_object import SbemObject
-from .sbem_object_set import SbemObjectSet
-from .sbem_window import SbemWindow
-from .sbem_door import SbemDoor
+from .sbem_object 		import SbemObject
+from .sbem_object_set 	import SbemObjectSet
+from .sbem_window 		import SbemWindow
+from .sbem_door 		import SbemDoor
 
 class SbemWall(SbemObject):
     @property
