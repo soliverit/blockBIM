@@ -15,23 +15,21 @@ import _thread
 from colorama 	import init, Fore, Back, Style
 init()
 #Project
-from lib.sbem_model.sbem_inp_model 	import SbemInpModel
-from lib.machine					import Machine
-from lib.block_set					import BlockSet
-from lib.receiver					import Receiver
-
-from lib.commands.command			import Command
+from lib.machine			import Machine
+from lib.block_set			import BlockSet
+from lib.receiver			import Receiver
+from lib.commands.command	import Command
 
 ############
 #	Distributed 
 ############
-class Environment():
+class BaseEnvironment():
 	##
 	# Global 
 	##
 	ROOT			= getcwd()
 	DATA_ROOT		= "%s/data/" %(ROOT)
-	SBEM_ROOT		= "%s/sbem/4.1.d/" %(ROOT)
+	BEM_ENG_ROOT		= "%s/sbem/4.1.d/" %(ROOT)
 	CONFIGS_ROOT	= "%s/configs/" %(ROOT)
 	SCRIPTS_ROOT	= "%s/scripts/" %(ROOT)
 	ENV_ROOT		= "%s/environments/" %(ROOT)
@@ -58,7 +56,6 @@ class Environment():
 	##
 	TARGET			= "BER"
 	PARAMETERS		= {"random_state": 1, "n_estimators":750}
-	
 	##
 	# Scripts 
 	##
@@ -80,11 +77,11 @@ class Environment():
 	#
 	#	return Environment
 	##
-	@staticmethod
-	def BuildEnvironment():
+	@classmethod
+	def BuildEnvironment(self):
 		name 	= str(randint(10000000, 100000000000000))
 		id		= __class__.GetModelID()
-		env		= __class__(name, id)
+		env		= self(name, id)
 		print("\n################ Build Environment ###############")
 		print("BuildEnvironment: Preparing environment repository")
 		env.createRepository()
@@ -112,18 +109,20 @@ class Environment():
 			__class__.TARGET, 
 			__class__.PARAMETERS
 		)
-	
-	@staticmethod
-	def RunSBEM(sbemModel):
-		pass
+	@classmethod
+	def getModelClass(self):
+		if not __class__.MODEL_CLASS:
+			raise "%s error: MODEL_CLASS hasn't been defined\nThe expected value is a class that implements DCEModel"
 	##
 	# Load SBEM model
 	##
-	@staticmethod
-	def LoadSbemModel(path):
+	@classmethod
+	def LoadModel(self, path):
 		model = False
 		with open(path) as file:
-			model = SbemInpModel(file.read())
+			print(self.__name__)
+			print(self.__class__)
+			model = self.MODEL_CLASS(file.read())
 		return model
 	##
 	# Get a valid Model ID (static)
@@ -146,15 +145,14 @@ class Environment():
 	#	modelID:	String [that can point to a valid model]
 	##
 	def __init__(self, name, modelID):
-		self.name 		= "%s_%s" %(name, modelID)
-		self.modelID	= modelID
+		self.name 				= "%s_%s" %(name, modelID)
+		self.modelID			= modelID
 		##
 		# Lad SBEM model and translate lighting templates to Efficacy
 		##
-		self.sbemModel	= __class__.LoadSbemModel(self.baseModelPath)
-		for zone in self.sbemModel.objects.filterByClass("SbemZone"):
-			zone.toChosen()
-		self.regressor			= __class__.CreateRegressor(self.trainingDataPath)
+		self.model				= self.__class__.LoadModel(self.baseModelPath)
+		
+		self.regressor			= self.__class__.CreateRegressor(self.trainingDataPath)
 		self.features			= []
 		self.blockSet			= BlockSet(self.blocksPath)	
 		self.receiver			= Receiver(__class__.ENV_ROOT, self.modelID)
@@ -170,13 +168,6 @@ class Environment():
 		self.networkEventsThread= False
 		#Print message passed to self.printMessage
 		self.silent				= False
-		##
-		# Do model prep
-		##
-		res 					= self.getBaseEPCResults()
-		self.SER				= res["SER"]
-		self.BER				= res["BER"]
-		self.sbemModel.setSER(self.SER)
 	##
 	# Pop a cap in the processor's... Terminate the environment
 	##
@@ -193,23 +184,24 @@ class Environment():
 		if command.replace(" ","").replace("\t","").replace("\n","") == "":
 			return False
 		commandComponents = Command.CommandToArray(command)
+		commandComponents[0] 	= commandComponents[0].lower()
 		##
 		# Terminate environment
 		##
 		validCommand	= False
 		#Default Command type. Changed or nulled for custom or skip tracking
-		if commandComponents[0].lower() == "exit":
+		if commandComponents[0] == "exit":
 			self.terminate()
 			track=False
 		##
 		# Print help
 		##
-		if commandComponents[0].lower() == "help":
+		if commandComponents[0] == "help":
 			self.printHelp()
 		##
 		# Modify object command
 		##
-		elif commandComponents[0].lower() == "modify":
+		elif commandComponents[0] == "modify":
 			if len(commandComponents) < 5:
 				self.printMessage("Too few parameters for 'modify'. Expects 4", "Error")
 				self.printMessage("'modify' expects (objectName, property, value, cost)", "Error")
@@ -224,40 +216,43 @@ class Environment():
 		##
 		# Disconnect
 		##
-		elif commandComponents[0].lower() == "disconnect":
+		elif commandComponents[0] == "disconnect":
 			self.printMessage("Disconnecting", "Network")
 			self.connected 	= False
 			track			= False
 		##
 		# Generate next block
 		##
-		elif commandComponents[0].lower() == "broadcast":
+		elif commandComponents[0] == "broadcast":
 			self.printMessage("Processing next Block", "Broadcast")
 			generated 		= self.blockSet.generateNextBlock(self.name)
 			track			= False
 		##
 		# Connect
 		##
-		elif commandComponents[0].lower() == "connect":
+		elif commandComponents[0] == "connect":
 			self.printMessage("Connecting", "Network")
 			self.connected 	= True
 			track			= False
-		elif commandComponents[0].lower() == "listblocks":	
+		##
+		# List the names of all blocks in the chain
+		##
+		elif commandComponents[0] == "listblocks":	
 			for block in self.blockSet.blocks:
 				print(block.filename)
 				track		= False
 		##
 		# List all names of an object type, optional properties
 		##
-		elif commandComponents[0].lower() == "list":
+		elif commandComponents[0] == "list":
 			self.printMessage("Listing '%s' objects" %(commandComponents[1].upper()))
-			sbemObjectSet = self.sbemModel.objects.filterByClass("Sbem%s" %(commandComponents[1]))	
 			##
 			# List objects and properties
 			##
-			if len(sbemObjectSet) > 0:
+			objectSet = self.model.objects.filterByClass("Sbem%s" %(commandComponents[1]))	
+			if len(objectSet) > 0:
 				print("\n\t====== %s list ======")
-				for object in sbemObjectSet.objects:
+				for object in objectSet.objects:
 					self.printMessage(object.name,type="Name", pad="\t  ")
 					if len(commandComponents) > 2:
 						properties = commandComponents[2].split(",")
@@ -269,7 +264,7 @@ class Environment():
 		##
 		# List static scripts
 		##
-		elif commandComponents[0].lower() == "listscripts":
+		elif commandComponents[0] == "listscripts":
 			print("\t### Listing static scripts ###")
 			for path in glob(__class__.SCRIPTS_ROOT + "*"):
 				print("\t%s" %(path.split("\\")[-1].split("/")[-1]))
@@ -277,13 +272,13 @@ class Environment():
 		##
 		# Broadcast
 		##
-		elif command.lower().startswith("broadcast"):
+		elif commandComponents[0] == "broadcast":
 			self.doBroadcast()
 			track	= False
 		##
 		# Run an external script
 		##
-		elif command.lower().startswith("script"):
+		elif commandComponents[0] == "script":
 			if len(commandComponents) == 3:
 				self.interpretCommand("ps %s" %(commandComponents[1]))
 			self.doScript(commandComponents)
@@ -292,7 +287,7 @@ class Environment():
 		##
 		# Write message
 		##
-		elif commandComponents[0].lower() == "chat":
+		elif commandComponents[0] == "chat":
 			self.printMessage("\t%s SAYS: %s" %(self.name, " ".join(commandComponents[1: ])), type=Fore.WHITE +"Communication" + Fore.RESET, colour=Fore.YELLOW)
 			track 			= True
 			validCommand	= True
@@ -300,7 +295,7 @@ class Environment():
 		##
 		# Print the contents of a script
 		##
-		elif commandComponents[0].lower() == "ps" or command.lower().startswith("printscript"):
+		elif commandComponents[0] == "ps" or commandComponents[0] == "printscript":
 			if len(commandComponents) < 2:
 				self.printMessage("Print Script requires one input parameter", "Error")
 				return False
@@ -388,7 +383,7 @@ class Environment():
 		
 		self.printMessage("Modifying the building model")
 		self.printMessage("Setting %s of object %s to %s" %(property, objectName, value))
-		sbemObject 				= self.sbemModel.findObjectByName(objectName)
+		sbemObject 				= self.model.findObjectByName(objectName)
 		sbemObject[property] 	= value	
 		##
 		# Print update
@@ -441,7 +436,7 @@ class Environment():
 					self.interpretCommand(str(command), track=False)
 			if len(newBlocks) > 0:
 				self.printBuilding()
-				self.printSBEM()
+				self.printModel()
 				__class__.FlushConsole()
 			
 				
@@ -474,7 +469,7 @@ class Environment():
 	# Get the predicted BER for the model in its current state 	
 	##
 	def getCurrentPrediction(self):
-		return self.regressor.predict(self.sbemModel.extractFeatures(self.features))
+		return self.regressor.predict(self.model.extractFeatures(self.features))
 	##
 	# Add feature
 	##
@@ -499,7 +494,7 @@ class Environment():
 	##
 	def saveLocalModel(self):
 		with open(self.modelPath, "w") as model:
-			model.write(str(self.sbemModel))
+			model.write(str(self.model))
 	##
 	# Create repo if it doesn't exist
 	##
@@ -522,41 +517,7 @@ class Environment():
 	def cleanup(self):
 		rmtree(self.path)
 	def printHelp(self):
-		print("""
-#################################################
-#   DCE-MOOSBEM V1.0                            #
-#                                               #
-#   Welcome to DCE-MOOSBEM, the decentralised	#
-#   common data environment for the MOOSBEM     #
-#   gradient boosting regressor estimator for   #
-#   the Simplified Building Energy Model        #
-#                                               #
-# Functions:                                    #
-#   broadcast:	Generate a new block from       #
-#               your changes                    #
-#   connect:    Connect to the network          #
-#   disconnect:	Disconnect from network	        #
-#   exit:       Terminate the service           #
-#   help:       Print this help message         #
-#   list:       List objects                    #
-#       Type:  HvacSystem, Construction, etc    #
-#       Props: Comma delimited list of          #
-#              SbemObject properties, AREA,     #
-#              U-VALUE,<custom property>, etc   #
-#   listBlocks: List all block names            #
-#   modify:    Update the value of a property   #
-#              an SbemObject with cost change   #
-#       Name:     SBEM object name              #	
-#       Property: SBEM object property name     #	
-#       Value:    New value                     #
-#       Cost:     Change to cost                #
-#   printscript:  Print a script's content      #
-#       Script:  Name of the script             #
-#   ps:       As printscript                    #
-#   script:   Run a script from the scripts dir	#
-#      Name:     Name of the script             #
-#################################################
-		""")
+		raise "%s error: printHelp has not been defined" %(__class__.__name__)
 	##
 	# Print summary
 	##
@@ -569,22 +530,14 @@ class Environment():
 		print(" #  Hot scripts:\t%s" %(self.hotScriptsPath))
 		print(" #  Local model:\t%s" %(self.modelPath))
 		print(" #  Base model:\t\t%s" %(self.baseModelPath))
-		print(" #  SBEM:\t\t%s" %(__class__.SBEM_ROOT))
+		print(" #  BEM Engine:\t\t%s" %(__class__.BEM_ENG_ROOT))
 		print(" #  Train data:\t%s" %(self.trainingDataPath))
 		self.printBuilding()
-		self.printSBEM()
-	def printSBEM(self):
-		print(" # SBEM:")
-		print(" #  BER:\t\t%s" %(self.BER))
-		print(" #  SER:\t\t%s" %(self.SER))
-		print(" #  Current BER:\t%s" %(self.getCurrentPrediction()))
+		self.printModel()
+	def printModel(self):
+		raise "%s error: printModel not defined"
 	def printBuilding(self):
-		print(" # Building:")
-		print(" #  Type:\t\t%s" %(self.sbemModel.general["B-TYPE"]))
-		print(" #  Area:\t\t%s" %(self.sbemModel.area))
-		print(" #  Location:\t%s" %(self.sbemModel.general["WEATHER"]))
-		print(" #  Build Cost:\t%s" %(self.cost))
-		print(" ###")
+		raise "%s error: printBuilding not defined"
 		
 	##
 	# Print features
