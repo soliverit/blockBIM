@@ -68,13 +68,7 @@ class DCEModelObject():
         self.props.setProp(key, value)
     def getProp(self, key):
         return self.props.getProp(key)
-    #Translate class name to SBEM object category
-    @classmethod
-    def sbemObjectCode(self):
-        return self.codeRegSplit.sub(r'-\1', self.__name__.replace("Sbem","")).upper()
-    @property
-    def sbemCode(self):
-        return self.__name__.replace("Sbem","").upper()
+    
 	#Handy printer
     def print(self):
         print("Name:" + self.name)
@@ -86,5 +80,4 @@ class DCEModelObject():
     # Get an attribute safely
     def safeGet(self, name, default):
         result = self.__getattr__(name)
-        
         return result if result is not None else default
